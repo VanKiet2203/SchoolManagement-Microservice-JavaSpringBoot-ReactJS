@@ -1,0 +1,527 @@
+.App {
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.app-header {
+  background-color: #007BFF;
+  color: white;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-title {
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-button {
+  background-color: white;
+  color: #007BFF;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.nav-button:hover {
+  background-color: #e0e0e0;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
+}
+/* ====== HomePage Styles ====== */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+.home-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  overflow: hidden; /* Đảm bảo hình nền không tràn ra ngoài */
+}
+
+.home-content p {
+  font-size: 24px;
+  font-weight: bold;
+  color: #222;
+  z-index: 2;
+  position: relative;
+}
+
+/* Background mờ phía sau */
+.home-content::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url('./login.jpg'); /* hoặc đường dẫn tương ứng */
+  background-size: cover; /* Phủ đều giữ tỷ lệ ảnh */
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.1; /* Độ mờ nhẹ */
+  z-index: 0;
+}
+
+.login-background {
+  position: relative;
+  min-height: 100vh;
+  background-image: url('./login.jpg'); /* hoặc đường dẫn tương ứng */
+  background-size: cover; /* làm cho ảnh phủ đầy nhưng vẫn giữ tỷ lệ */
+  background-position: center; /* căn giữa ảnh */
+  background-repeat: no-repeat; /* không lặp lại ảnh */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.login-form {
+  position: relative;
+  z-index: 1;
+  padding: 40px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.1); /* không nền trắng đục */
+  backdrop-filter: blur(4px); /* làm nền sau mờ đi một tí */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+}
+
+.login-form input {
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+}
+
+.login-form button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background-color: #0056b3;
+}
+
+.login-form p {
+  color: red;
+  margin-top: 8px;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #eef2f7;
+}
+
+.login-box {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 300px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background-color: #0056b3;
+}
+
+.login-error {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-success {
+  color: green;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-forgot {
+  text-align: right;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+
+/* ====== StudentManagement Styles ====== */
+.student-container {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+}
+
+.student-title {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0a4b78;
+}
+
+.class-select {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.class-select select {
+  padding: 8px 12px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.add-btn {
+  background-color: #2e8b57;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #1e90ff;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 4px;
+}
+
+.student-table-wrapper {
+  margin-top: 20px;
+}
+
+.student-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.student-table th,
+.student-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.student-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.success-message {
+  color: green;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ====== TeacherManagement Styles ====== */
+.teacher-container {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+}
+
+.teacher-title {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0a4b78;
+}
+
+.teacher-table-wrapper {
+  margin-top: 20px;
+}
+
+.teacher-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.teacher-table th,
+.teacher-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.teacher-table th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.add-btn {
+  background-color: #2e8b57;
+  color: white;
+}
+
+.edit-btn {
+  background-color: #1e90ff;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: white;
+  margin-left: 4px;
+}
+
+.no-data {
+  text-align: center;
+  font-style: italic;
+  color: #777;
+  margin-top: 10px;
+}
+/* ====== AddStudent Styles ====== */
+.form-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.form-title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #0a4b78;
+}
+
+.student-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-form input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.student-form input.readonly {
+  background-color: #f2f2f2;
+}
+
+.btn.submit-btn {
+  background-color: #2e8b57;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.btn.submit-btn:hover {
+  background-color: #267347;
+}
+.form-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.form-title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #0a4b78;
+}
+
+.student-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.student-form input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.student-form input[readonly] {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}
+
+.btn.submit-btn {
+  background-color: #1e90ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.btn.submit-btn:hover {
+  background-color: #0e70c0;
+}
+.form-container {
+  padding: 30px;
+  max-width: 600px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.form-title {
+  font-size: 26px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #0a4b78;
+}
+
+.teacher-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.teacher-form input {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.btn.submit-btn {
+  background-color: #1e90ff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.btn.submit-btn:hover {
+  background-color: #0e70c0;
+}
+.home-container {
+  padding: 20px;
+}
+
+.home-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
