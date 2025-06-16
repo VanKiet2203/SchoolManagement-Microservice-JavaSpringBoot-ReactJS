@@ -32,9 +32,10 @@ jobs:
     
     - name: Add execute permission to mvnw
       run: |
-        chmod +x Project/student-service/mvnw
-        chmod +x Project/teacher-service/mvnw
-        chmod +x Project/user-service/mvnw
+        cd Project
+        chmod +x student-service/mvnw
+        chmod +x teacher-service/mvnw
+        chmod +x user-service/mvnw
     
     - name: Build Backend Services
       run: |
