@@ -27,31 +27,32 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            System.out.println("Đăng nhập: " + request.getUsername());
+    try {
+        System.out.println("Đăng nhập: " + request.getUsername());
 
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-            );
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
 
-            var userDetails = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
+        var userDetails = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
 
-            var user = userRepo.findByUsername(request.getUsername());
-            if (user.isEmpty()) {
-                return ResponseEntity.status(404).body("Không tìm thấy người dùng");
-            }
-
-            String token = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getAuthorities());
-
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "role", user.get().getRole().name()
-            ));
-        } catch (Exception e) {
-            System.out.println("Lỗi xác thực: " + e.getMessage());
-            return ResponseEntity.status(401).body("Sai tên đăng nhập hoặc mật khẩu");
+        var user = userRepo.findByUsername(request.getUsername());
+        if (user.isEmpty()) {
+            return ResponseEntity.status(404).body("Không tìm thấy người dùng");
         }
+
+        String token = jwtUtils.generateJwtToken(userDetails.getUsername(), userDetails.getAuthorities());
+
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "role", user.get().getRole().name()
+        ));
+    } catch (Exception e) {
+        System.out.println("Lỗi xác thực: " + e.getMessage());
+        return ResponseEntity.status(401).body("Sai tên đăng nhập hoặc mật khẩu");
     }
+}
+
 
 
 

@@ -1,11 +1,14 @@
 package com.sagroup.userservice.utils;
 
+import com.sagroup.userservice.config.JwtConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -13,9 +16,18 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtils {
 
-    // Sử dụng Keys.secretKeyFor để tạo key tự động đủ mạnh cho HS512
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // Tạo key đủ mạnh cho HS512
-    private final long jwtExpirationMs = 86400000;
+    private final JwtConfig jwtConfig;
+    private Key key;
+
+    public JwtUtils(JwtConfig jwtConfig) {
+        this.jwtConfig = jwtConfig;
+    }
+
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = Base64.getDecoder().decode(jwtConfig.getSecret());
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateJwtToken(String username, Collection<? extends GrantedAuthority> authorities) {
         return Jwts.builder()
@@ -24,13 +36,10 @@ public class JwtUtils {
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(key, SignatureAlgorithm.HS512)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpirationMs()))
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
-
-
-
 
     public String getUsernameFromJwtToken(String token) {
         return Jwts.parserBuilder()

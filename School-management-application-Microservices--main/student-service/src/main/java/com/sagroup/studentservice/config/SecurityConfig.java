@@ -1,6 +1,6 @@
 package com.sagroup.studentservice.config;
 
-import com.sagroup.studentservice.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,10 +18,8 @@ import java.util.Arrays;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter();
-    }
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -39,19 +37,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().configurationSource(corsConfigurationSource()).and()
-                .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
+            .cors().configurationSource(corsConfigurationSource())
+            .and()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .authorizeRequests()
                 .antMatchers("/api/student/getStudents").hasAnyRole("ADMIN", "TEACHER")
                 .antMatchers("/api/student/addStudent").hasRole("ADMIN")
                 .antMatchers("/api/student/update/**").hasRole("ADMIN")
+                .antMatchers("/api/student/updateScore/**").hasAnyRole("ADMIN", "TEACHER")
                 .antMatchers("/api/student/delete/**").hasRole("ADMIN")
-                .antMatchers("/api/student/**").permitAll()
+                .antMatchers("/api/student/**").authenticated()
                 .anyRequest().authenticated()
-                .and()
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .and()
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -11,7 +11,6 @@ public interface NewAppUserRepository extends JpaRepository<NewAppUser, Long> {
     NewAppUser findByUsernameIgnoreCase(String username);
     NewAppUser findByResetToken(String token);
     Optional<NewAppUser> findByUsername(String username);
-
-
+    boolean existsByUsernameIgnoreCase(String username);
 }
 

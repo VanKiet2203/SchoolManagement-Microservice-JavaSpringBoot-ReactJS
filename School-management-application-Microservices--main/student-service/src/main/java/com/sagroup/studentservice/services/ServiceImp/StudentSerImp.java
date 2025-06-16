@@ -2,6 +2,7 @@ package com.sagroup.studentservice.services.ServiceImp;
 
 import com.sagroup.studentservice.domains.Student;
 import com.sagroup.studentservice.dto.NewUserRequest;
+import com.sagroup.studentservice.dto.ScoreUpdateDTO;
 import com.sagroup.studentservice.repositories.StudentRepo;
 import com.sagroup.studentservice.services.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,56 +31,78 @@ public class StudentSerImp implements StudentService {
     private RestTemplate restTemplate;
 
     private String getAuthToken() {
-        try {
-            String loginUrl = "http://localhost:8089/api/users/auth/login";
-            Map<String, String> loginRequest = Map.of(
-                "username", "admin",
-                "password", "123456"
-            );
-            
-            ResponseEntity<Map> response = restTemplate.postForEntity(
-                loginUrl,
-                loginRequest,
-                Map.class
-            );
-            
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                return (String) response.getBody().get("token");
-            }
-            throw new RuntimeException("Failed to get authentication token");
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to get authentication token: " + e.getMessage());
+    try {
+        String loginUrl = "http://localhost:8089/users/auth/login";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        
+        Map<String, String> loginRequest = Map.of(
+            "username", "admin",
+            "password", "123456"
+        );
+
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(loginRequest, headers);
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(loginUrl, request, Map.class);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            return (String) response.getBody().get("token");
         }
+        throw new RuntimeException("Failed to get authentication token");
+    } catch (Exception e) {
+        throw new RuntimeException("Failed to get authentication token: " + e.getMessage());
+    }
+}
+
+
+    @Override
+    public Optional<Student> getById(Long id) {
+        return studentRepo.findById(id);
     }
 
     @Override
-    public Optional<Student> getById(Long id){
-        return studentRepo.findById(id);
+    public Optional<Student> getStudentWithScores(Long id) {
+        Optional<Student> student = studentRepo.findById(id);
+        student.ifPresent(this::assignAcademicPerformance);
+        return student;
     }
 
     @Override
     public Student addStudent(Student student) {
         if (student != null) {
+            // Check if email already exists in user-service
+            
+            String checkEmailUrl = "http://localhost:8089/users/check-email?email=" + student.getEmail();
+            HttpHeaders checkHeaders = new HttpHeaders();
+            checkHeaders.setBearerAuth(getAuthToken());
+            HttpEntity<Void> checkEntity = new HttpEntity<>(checkHeaders);
+            ResponseEntity<Boolean> checkResponse = restTemplate.exchange(checkEmailUrl, HttpMethod.GET, checkEntity, Boolean.class);
+            Boolean emailExists = checkResponse.getBody();
+            if (Boolean.TRUE.equals(emailExists)) {
+                throw new RuntimeException("Email already exists in the system");
+            }
+// ... existing code ...
+
             assignAcademicPerformance(student);
             Student savedStudent = studentRepo.save(student);
 
-            // Create user account in user-service
+            // Prepare user account creation
             NewUserRequest userRequest = new NewUserRequest(
                 student.getEmail(),
                 "STUDENT",
-                "123456" // Default password, should be changed on first login
+                "123456" // Default password
             );
 
             try {
-                String userServiceUrl = "http://localhost:8089/api/users/create";
-                
-                // Create headers with authentication
+                String userServiceUrl = "http://localhost:8089/users/create";
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.setContentType(MediaType.APPLICATION_JSON);
                 headers.setBearerAuth(getAuthToken());
 
                 HttpEntity<NewUserRequest> requestEntity = new HttpEntity<>(userRequest, headers);
-                
+
                 ResponseEntity<String> response = restTemplate.exchange(
                     userServiceUrl,
                     HttpMethod.POST,
@@ -88,12 +111,11 @@ public class StudentSerImp implements StudentService {
                 );
 
                 if (!response.getStatusCode().is2xxSuccessful()) {
-                    // If user creation fails, delete the student
                     studentRepo.delete(savedStudent);
                     throw new RuntimeException("Failed to create user account: " + response.getBody());
                 }
+
             } catch (Exception e) {
-                // If user creation fails, delete the student
                 studentRepo.delete(savedStudent);
                 throw new RuntimeException("Failed to create user account: " + e.getMessage());
             }
@@ -103,25 +125,20 @@ public class StudentSerImp implements StudentService {
         return null;
     }
 
-
-
-
-
     @Override
     public Student update(Long id, Student student) {
         Student repoStudent = studentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
+        // Chỉ cập nhật thông tin cá nhân
         repoStudent.setFirstName(student.getFirstName());
         repoStudent.setLastName(student.getLastName());
-        repoStudent.setMathScore(student.getMathScore());
-        repoStudent.setPhysicsScore(student.getPhysicsScore());
-        repoStudent.setChemistryScore(student.getChemistryScore());
-        repoStudent.setLiteratureScore(student.getLiteratureScore());
-        repoStudent.setEnglishScore(student.getEnglishScore());
-        repoStudent.setBehaviorScore(student.getBehaviorScore());
+        repoStudent.setEmail(student.getEmail());
+        repoStudent.setPhone(student.getPhone());
+        repoStudent.setAddress(student.getAddress());
         repoStudent.setClassName(student.getClassName());
 
+        // Giữ nguyên điểm và học lực
         assignAcademicPerformance(repoStudent);
 
         return studentRepo.save(repoStudent);
@@ -138,13 +155,10 @@ public class StudentSerImp implements StudentService {
         return students;
     }
 
-
-
     @Override
     public void removeById(Long id) {
         studentRepo.deleteById(id);
     }
-
 
     @Override
     public List<Student> getAllStudents() {
@@ -153,6 +167,12 @@ public class StudentSerImp implements StudentService {
         return students;
     }
 
+    @Override
+    public Optional<Student> findByEmail(String email) {
+        Optional<Student> student = studentRepo.findByEmail(email);
+        student.ifPresent(this::assignAcademicPerformance);
+        return student;
+    }
 
     private void assignAcademicPerformance(Student student) {
         System.out.println("Tính học lực cho student: " + student.getFirstName() + " " + student.getLastName());
@@ -182,6 +202,7 @@ public class StudentSerImp implements StudentService {
         }
 
         double avg = count > 0 ? total / count : 0;
+        student.setAverageScore(avg); // Set the average score
 
         String performance;
         if (avg >= 8.0) performance = "Giỏi";
@@ -193,7 +214,6 @@ public class StudentSerImp implements StudentService {
 
         student.setAcademicPerformance(performance);
     }
-
 
     @Override
     public Map<String, Map<String, Long>> getPerformanceStatisticsByClass() {
@@ -209,5 +229,21 @@ public class StudentSerImp implements StudentService {
                 ));
     }
 
+    @Override
+    public Student updateScore(Long id, ScoreUpdateDTO scoreUpdateDTO) {
+        Student student = studentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + id));
+
+        student.setMathScore(scoreUpdateDTO.getMathScore());
+        student.setPhysicsScore(scoreUpdateDTO.getPhysicsScore());
+        student.setChemistryScore(scoreUpdateDTO.getChemistryScore());
+        student.setLiteratureScore(scoreUpdateDTO.getLiteratureScore());
+        student.setEnglishScore(scoreUpdateDTO.getEnglishScore());
+        student.setBehaviorScore(scoreUpdateDTO.getBehaviorScore());
+
+        assignAcademicPerformance(student);
+
+        return studentRepo.save(student);
+    }
 
 }

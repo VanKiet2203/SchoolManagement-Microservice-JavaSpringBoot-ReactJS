@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Header from '../components/common/Header';
-import { studentApi } from '../services/studentApi';
+import studentApi from '../services/studentApi';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';

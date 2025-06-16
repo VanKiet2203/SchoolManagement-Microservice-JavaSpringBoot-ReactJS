@@ -9,10 +9,22 @@ function TeacherManagement({ onLogout }) {
 
     const fetchTeachers = async () => {
         try {
-            const res = await teacherApi.get('/');
+            // Add debugging logs
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+            console.log('Current token:', token);
+            console.log('Current role:', role);
+            
+            const res = await teacherApi.get('/getTeachers');
             setTeachers(res.data);
         } catch (error) {
             console.error("Lỗi khi lấy danh sách giáo viên:", error);
+            // Add more detailed error logging
+            if (error.response) {
+                console.error("Error response:", error.response.data);
+                console.error("Error status:", error.response.status);
+                console.error("Error headers:", error.response.headers);
+            }
         }
     };
 
@@ -25,7 +37,7 @@ function TeacherManagement({ onLogout }) {
         if (!confirmDelete) return;
 
         try {
-            await teacherApi.delete(`/${id}`);
+            await teacherApi.delete(`/delete/${id}`);
             alert("Xóa giáo viên thành công!");
             fetchTeachers();
         } catch (error) {
@@ -58,7 +70,8 @@ function TeacherManagement({ onLogout }) {
                             <th>Số điện thoại</th>
                             <th>Địa chỉ</th>
                             <th>Lớp chủ nhiệm</th>
-                            <th>Giảng dạy môn</th>
+                            <th>Lớp giảng dạy</th>
+                            <th>Môn giảng dạy</th>
                             <th>Thao tác</th>
                         </tr>
                         </thead>
@@ -70,7 +83,12 @@ function TeacherManagement({ onLogout }) {
                                 <td>{t.phone}</td>
                                 <td>{t.address}</td>
                                 <td>{t.homeroomClass}</td>
-                                <td>{t.subject}</td>
+                                <td>
+                                    {t.teachingClasses ? t.teachingClasses.join(", ") : ""}
+                                </td>
+                                <td>
+                                    {t.subject}
+                                </td>
                                 <td>
                                     <button
                                         className="btn edit-btn"

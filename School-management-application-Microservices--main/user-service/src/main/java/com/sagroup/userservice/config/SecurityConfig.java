@@ -28,21 +28,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().configurationSource(corsConfigurationSource()).and()
-                .csrf().disable()
-                .authorizeRequests()
+            .cors().configurationSource(corsConfigurationSource()).and()
+            .csrf().disable()
+            .authorizeHttpRequests(authz -> authz
                 .antMatchers("/users/auth/login", "/users/create", "/users/auth/request-reset", "/users/auth/reset-password").permitAll()  // Allow access to login and user creation endpoints
+                .antMatchers("/users/auth/change-password").authenticated()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/teacher/**").hasRole("TEACHER")
                 .antMatchers("/student/**").hasRole("STUDENT")
                 .anyRequest().authenticated()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            )
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {

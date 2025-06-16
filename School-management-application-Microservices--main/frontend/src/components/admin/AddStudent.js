@@ -24,16 +24,22 @@ const AddStudent = ({ onLogout }) => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await studentApi.post('/addStudent', form);
-            alert('✅ Thêm học sinh thành công!');
-            navigate('/students');
-        } catch (error) {
-            console.error('Lỗi thêm học sinh:', error);
-            alert('❌ Lỗi thêm học sinh!');
-        }
-    };
+    e.preventDefault();
+    try {
+        const token = localStorage.getItem('token');
+        await studentApi.post('/addStudent', form, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        alert('✅ Thêm học sinh thành công!');
+        navigate('/students');
+    } catch (error) {
+        console.error('Lỗi thêm học sinh:', error);
+        alert('❌ Lỗi thêm học sinh!');
+    }
+};
+
 
     return (
         <div>

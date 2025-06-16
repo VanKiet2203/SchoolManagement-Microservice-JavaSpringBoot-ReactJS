@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +16,8 @@ import org.springframework.core.env.Environment;
 import com.sagroup.userservice.entity.Role;
 
 import com.sagroup.userservice.config.ConfigFileExternalizationConfig;
+import com.sagroup.userservice.config.JwtConfig;
+
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableJpaRepositories("com.sagroup.userservice.repository")
 @EnableDiscoveryClient
 @OpenAPIDefinition
+@EnableConfigurationProperties(JwtConfig.class)
 public class UserServiceApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceApplication.class);
@@ -56,7 +60,8 @@ public class UserServiceApplication {
 			if (userRepository.findByUsernameIgnoreCase("admin") == null) {
 				NewAppUser admin = new NewAppUser();
 				admin.setUsername("admin");
-				admin.setPassword(passwordEncoder.encode("123456")); // Encode
+				admin.setPassword(passwordEncoder.encode("123456"));
+				 // Encode
 				admin.setRole(Role.valueOf("ADMIN"));
 				userRepository.save(admin);
 				LOGGER.info("✅ Admin user created successfully.");

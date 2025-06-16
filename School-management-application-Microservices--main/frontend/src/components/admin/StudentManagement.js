@@ -3,20 +3,28 @@ import studentApi from '../../services/studentApi';
 import { useNavigate } from 'react-router-dom';
 import Header from "../common/Header";
 
-const StudentManagement = () => {
+const StudentManagement = ({ onLogout }) => {
     const [students, setStudents] = useState([]);
     const [selectedClass, setSelectedClass] = useState('');
     const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             if (selectedClass) {
+                setLoading(true);
+                setError('');
                 try {
                     const res = await studentApi.get(`/byClass/${selectedClass}`);
                     setStudents(res.data);
                 } catch (err) {
                     console.error('Lỗi khi lấy học sinh:', err);
+                    setError('Không thể tải danh sách học sinh. Vui lòng thử lại sau.');
+                    setStudents([]);
+                } finally {
+                    setLoading(false);
                 }
             }
         };
@@ -29,23 +37,30 @@ const StudentManagement = () => {
 
         try {
             await studentApi.delete(`/delete/${id}`);
-            alert('Xóa học sinh thành công!');
+            setMessage('✅ Xóa học sinh thành công!');
             // Refresh lại danh sách
             const res = await studentApi.get(`/byClass/${selectedClass}`);
             setStudents(res.data);
+            
+            // Tự động ẩn thông báo sau 3 giây
+            setTimeout(() => setMessage(''), 3000);
         } catch (error) {
             console.error('Lỗi xoá:', error);
-            alert('Lỗi khi xóa học sinh');
+            setError('❌ Lỗi khi xóa học sinh. Vui lòng thử lại.');
+            
+            // Tự động ẩn thông báo lỗi sau 3 giây
+            setTimeout(() => setError(''), 3000);
         }
     };
 
     return (
         <div>
-            <Header />
+            <Header onLogout={onLogout} />
             <div className="student-container">
                 <h2 className="student-title">Danh sách học sinh</h2>
 
                 {message && <p className="success-message">{message}</p>}
+                {error && <p className="error-message">{error}</p>}
 
                 <div className="class-select">
                     <label htmlFor="classDropdown">Chọn lớp:</label>
@@ -76,7 +91,9 @@ const StudentManagement = () => {
                         <div className="student-table-wrapper">
                             <h3>Danh sách học sinh lớp {selectedClass}</h3>
 
-                            {students.length > 0 ? (
+                            {loading ? (
+                                <p className="loading-message">Đang tải dữ liệu...</p>
+                            ) : students.length > 0 ? (
                                 <table className="student-table">
                                     <thead>
                                     <tr>
@@ -102,38 +119,34 @@ const StudentManagement = () => {
                                                 <button
                                                     className="btn view-btn"
                                                     onClick={() => navigate(`/students/score/view/${student.studentNumber}`)}
-
                                                 >
                                                     📊 Xem điểm
                                                 </button>
                                                 <button
                                                     className="btn enter-btn"
                                                     onClick={() => navigate(`/students/score/edit/${student.studentNumber}`)}
-
                                                 >
                                                     ✍️ Nhập điểm
                                                 </button>
                                                 <button
                                                     className="btn edit-btn"
                                                     onClick={() => navigate(`/students/edit/${student.studentNumber}`)}
-
                                                 >
-                                                    Sửa
+                                                    ✏️ Sửa
                                                 </button>
                                                 <button
                                                     className="btn delete-btn"
                                                     onClick={() => handleDelete(student.studentNumber)}
                                                 >
-                                                    Xoá
+                                                    🗑️ Xoá
                                                 </button>
                                             </td>
                                         </tr>
                                     ))}
                                     </tbody>
-
                                 </table>
                             ) : (
-                                <p>Không có học sinh nào trong lớp <strong>{selectedClass}</strong>.</p>
+                                <p className="no-data">Không có học sinh nào trong lớp <strong>{selectedClass}</strong>.</p>
                             )}
                         </div>
                     </div>

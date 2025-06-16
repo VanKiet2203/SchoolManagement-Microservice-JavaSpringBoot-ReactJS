@@ -25,6 +25,20 @@ public class NewAppUserService {
         return userRepository.findAll();
     }
 
+    public void changePassword(String username, String currentPassword, String newPassword) {
+        NewAppUser user = userRepository.findByUsernameIgnoreCase(username);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     public NewAppUser update(NewAppUserDto userDto) {
         Long userId = Long.valueOf(userDto.getId());
         NewAppUser userToBeUpdated = userRepository.findById(userId)
@@ -116,9 +130,9 @@ public class NewAppUserService {
             NewAppUser admin = new NewAppUser();
             admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("123456"));
-            admin.setRole(Role.ADMIN);  // Assigning the admin role
+            admin.setRole(Role.ADMIN);
             userRepository.save(admin);
-            System.out.println("✅ Admin account created: admin / 123456");
         }
     }
+
 }

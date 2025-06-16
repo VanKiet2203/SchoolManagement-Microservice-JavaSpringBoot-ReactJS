@@ -11,7 +11,7 @@ const ViewScore = ({ onLogout }) => {
     useEffect(() => {
         const fetchStudent = async () => {
             try {
-                const res = await studentApi.get(`/${id}`);
+                const res = await studentApi.get(`/scores/${id}`);
                 setStudent(res.data);
             } catch (error) {
                 console.error("Lỗi khi lấy điểm:", error);
