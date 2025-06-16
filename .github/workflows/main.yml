@@ -30,12 +30,12 @@ jobs:
         distribution: 'temurin'
         cache: maven
     
-    # - name: Add execute permission to mvnw
-    #   run: |
-    #     cd Project
-    #     chmod +x student-service/mvnw
-    #     chmod +x teacher-service/mvnw
-    #     chmod +x user-service/mvnw
+    - name: Add execute permission to mvnw
+      run: |
+        cd Project
+        chmod +x student-service/mvnw
+        chmod +x teacher-service/mvnw
+        chmod +x user-service/mvnw
     
     - name: Build Backend Services
       run: |
